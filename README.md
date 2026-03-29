@@ -1,1 +1,13 @@
-# simon-android-intermediate
+# Simon Game - Progetto Intermedio
+
+Applicazione Android che implementa una variante del gioco "Simon" per il corso di **Programmazione di sistemi embedded** 2025-2026 presso l'Università degli Studi di Padova.
+
+## 📱 Dispositivo di Sviluppo
+
+- **Tipo di dispositivo**: Emulatore (Android Virtual Device)
+- **Modello**: Google Pixel 2
+- **Versione Android Testata**: API 36 (Android 16) con Google API
+
+## 📋 Descrizione del Progetto
+
+I dettagli completi della consegna sono disponibili nel documento: [Project ESP2526 1 (intermediate).pdf](Project%20ESP2526%201%20(intermediate).pdf)
