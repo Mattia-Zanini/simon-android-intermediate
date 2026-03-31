@@ -1,6 +1,5 @@
 package com.example.simon_intermediate
 
-import android.R
 import android.content.res.Configuration
 import android.os.Bundle
 import android.util.Log
@@ -8,14 +7,13 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -25,7 +23,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -36,26 +33,23 @@ import com.example.simon_intermediate.ui.theme.SimonIntermediateTheme
 
 class MainActivity : ComponentActivity() {
 
-    // Called when the activity is first created
+    // Viene chiamato quando l'activity viene creata per la prima volta
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // Enable edge-to-edge display on API level < 35
+        // Abilita la visualizzazione "edge-to-edge" (a tutto schermo) per le versioni API < 35
         enableEdgeToEdge()
 
-        // Set and display the UI content
+        // Imposta e visualizza il contenuto dell'interfaccia utente (UI)
         setContent {
             SimonIntermediateTheme {
 
                 // Reference: https://developer.android.com/develop/ui/compose/components/scaffold
-                // The scaffold fills the whole display area
+                // Lo scaffold riempie l'intera area del display
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
 
-                    // MainScreen consumes the insets to keep the app UI away from the system UI and display cutouts
-                    /*Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )*/
+                    // MainScreen utilizza gli "insets" (presenti in 'innerPadding') per mantenere
+                    // l'interfaccia utente lontana dalla UI di sistema e dai ritagli del display (come il notch)
                     MainScreen(
                         modifier = Modifier
                             .fillMaxSize()
@@ -76,7 +70,7 @@ fun MainScreen(modifier: Modifier = Modifier) {
 
     // Reference: https://developer.android.com/develop/ui/compose/layouts/constraintlayout
     ConstraintLayout(modifier = modifier) {
-        val (b1, b2, b3, b4, b5, b6, textBox) = createRefs()
+        val (b1, b2, b3, b4, b5, b6, textBox, endGame, delete) = createRefs()
 
         // Shape uguale per tutti i pulsanti
         val btnShape = RoundedCornerShape(6.dp)
@@ -202,10 +196,17 @@ fun MainScreen(modifier: Modifier = Modifier) {
                 onClick = {
                     Log.d("MainActivity - Button", "B${index + 1}: ${btnStrings[index]} clicked")
 
-                    txt += btnStrings[index] + ","
+                    if (txt == "")
+                        txt += btnStrings[index]
+                    else
+                        txt += ", " + btnStrings[index]
                 }
             ) {}
         }
+
+        // Reference: https://developer.android.com/reference/kotlin/androidx/compose/foundation/rememberScrollState.composable
+        // Crea e "ricorda" un oggetto che mantiene traccia della posizione attuale dello scorrimento.
+        val scrollState = rememberScrollState()
 
         Text(
             text = txt,
@@ -216,9 +217,12 @@ fun MainScreen(modifier: Modifier = Modifier) {
 
                     start.linkTo(parent.start, margin = 16.dp)
                     end.linkTo(parent.end, margin = 16.dp)
+
                     top.linkTo(b5.bottom)
                     top.linkTo(b6.bottom)
-                    bottom.linkTo(parent.bottom, margin = 16.dp)
+
+                    bottom.linkTo(delete.bottom, margin = 8.dp)
+                    bottom.linkTo(endGame.bottom, margin = 8.dp)
                 }
                 // Applica il colore allo sfondo della text
                 .background(
@@ -226,8 +230,37 @@ fun MainScreen(modifier: Modifier = Modifier) {
                     shape = RoundedCornerShape(8.dp)
                 )
                 // Aggiungo il padding (Margine interno), questo sposta il testo lontano dai bordi del box
-                .padding(16.dp),
+                .padding(16.dp)
+
+                // Collega lo stato al modificatore per abilitare lo scroll
+                .verticalScroll(scrollState),
         )
+
+        // Cancella
+        Button(
+            modifier = Modifier.constrainAs(delete) {
+                start.linkTo(parent.start, margin = 16.dp)
+                top.linkTo(textBox.bottom)
+                bottom.linkTo(parent.bottom, margin = 8.dp)
+            },
+            onClick = {
+                Log.d("MainActivity - Button", "'Delete' clicked")
+
+                txt = ""
+            }
+        ) { Text(stringResource(R.string.delete_sequence_btn)) }
+
+        // Fine Partita
+        Button(
+            modifier = Modifier.constrainAs(endGame) {
+                end.linkTo(parent.end, margin = 16.dp)
+                top.linkTo(textBox.bottom)
+                bottom.linkTo(parent.bottom, margin = 8.dp)
+            },
+            onClick = {
+                Log.d("MainActivity - Button", "'End Game' clicked")
+            }
+        ) { Text(stringResource(R.string.end_game_btn)) }
     }
 }
 
