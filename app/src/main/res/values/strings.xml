@@ -2,4 +2,6 @@
     <string name="app_name" translatable="false">Simon-Intermediate</string>
     <string name="delete_btn">Delete</string>
     <string name="end_game_btn">End Game</string>
+    <string name="history_title_text">Games History</string>
+    <string name="back_btn">Back</string>
 </resources>

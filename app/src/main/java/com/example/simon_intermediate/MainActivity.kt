@@ -1,5 +1,6 @@
 package com.example.simon_intermediate
 
+import android.content.Intent
 import android.content.res.Configuration
 import android.os.Bundle
 import android.util.Log
@@ -28,7 +29,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
@@ -37,11 +37,16 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.simon_intermediate.ui.theme.SimonIntermediateTheme
 
+// Tag per il logger di debug di MainActivity
+const val tagMainD = "MainActivity"
+
 class MainActivity : ComponentActivity() {
 
     // Viene chiamato quando l'activity viene creata per la prima volta
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        Log.d(tagMainD, "onCreate Activity 1")
 
         // Abilita la visualizzazione "edge-to-edge" (a tutto schermo) per le versioni API < 35
         enableEdgeToEdge()
@@ -59,7 +64,25 @@ class MainActivity : ComponentActivity() {
                     MainScreen(
                         modifier = Modifier
                             .fillMaxSize()
-                            .padding(innerPadding)
+                            .padding(innerPadding),
+                        onEndGameClick = { updatedHistory -> // <-- Ricevo lo storico dal composable
+
+                            val myIntent = Intent(this, GamesHistory::class.java)
+
+                            // Reference: https://developer.android.com/reference/android/content/Intent#putExtra(java.lang.String,%20android.os.Parcelable)
+                            // Trasformo la List in ArrayList, che android sa trattare, per passarla come "StringArrayListExtra"
+                            myIntent.putStringArrayListExtra(
+                                "GAMES_HISTORY",
+                                ArrayList(updatedHistory.reversed()) // "reversed" così in questo modo la partita appena fatta è in cima alla lista
+                            )
+
+                            Log.d(tagMainD, "Inserted the history inside the intent")
+
+                            Log.d(tagMainD, "startActivity of Screen 2")
+
+                            // Avvio l'Activity, non verranno ricevute informazioni quando l'Activity termina
+                            startActivity(myIntent)
+                        }
                     )
                 }
             }
@@ -68,12 +91,13 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun MainScreen(modifier: Modifier = Modifier) {
+fun MainScreen(modifier: Modifier = Modifier, onEndGameClick: (List<String>) -> Unit) {
     // Recupero l'orientamento attuale del dispositivo
     val orientation = LocalConfiguration.current.orientation
     val isPortrait: Boolean = orientation == Configuration.ORIENTATION_PORTRAIT
 
-    val tag = "MainActivity"
+    // Contiene lo storico di tutte le partite
+    var history by rememberSaveable { mutableStateOf(listOf<String>()) }
 
     // Stato per memorizzare la sequenza di colori cliccati
     var txt by rememberSaveable { mutableStateOf("") }
@@ -83,17 +107,32 @@ fun MainScreen(modifier: Modifier = Modifier) {
     // Lettere associate ai colori
     val btnStrings = listOf("R", "G", "B", "M", "Y", "C")
 
-    // Assegno il numero di colonne e di righe a seconda dell'orientamento
-    val cols: Int = if (isPortrait) 3 else 2
-    val rows: Int = if (isPortrait) 2 else 3
+    // Assegno il numero di colonne e di righe
+    val cols = 3
+    val rows = 2
 
     // Altezza variabile per la TextBox a seconda dell'orientamento
     val textBoxHeight = if (isPortrait) 180.dp else 200.dp
 
-    // Questa è la lambda che viene utilizzata in entrambi i casi (sia portrait che landscape)
-    val onColorClick: (String) -> Unit = { color ->
-        txt += if (txt == "") color else ", $color"
-        Log.d(tag, "BTN '$color' clicked")
+    // Queste sono le lambda che vengono utilizzate in entrambe le situazioni (sia portrait che landscape)
+    val onColorClick: (String) -> Unit = { color -> // Faccio State Hoisting
+        txt += if (txt.isEmpty()) color else ", $color"
+        Log.d(tagMainD, "BTN '$color' clicked")
+    }
+
+    val onDeleteClick: () -> Unit = {
+        txt = "" // ripulisco la text
+        Log.d(tagMainD, "BTN 'Delete' clicked")
+    }
+
+    val onEndClick: () -> Unit = {
+        Log.d(tagMainD, "BTN 'End Game' clicked")
+
+        if (!txt.isEmpty())
+            history += txt // aggiungo la sequenza allo storico
+        txt = "" // ripulisco la text
+
+        onEndGameClick(history)
     }
 
     if (isPortrait) {
@@ -117,11 +156,8 @@ fun MainScreen(modifier: Modifier = Modifier) {
 
             // Zona pulsanti di controllo
             ActionButtons(
-                onDelete = {
-                    txt = ""
-                    Log.d(tag, "BTN 'Delete' clicked")
-                },
-                onEnd = { Log.d(tag, "BTN 'End Game' clicked") }
+                onDelete = onDeleteClick,
+                onEnd = onEndClick
             )
         }
     } else {
@@ -154,11 +190,8 @@ fun MainScreen(modifier: Modifier = Modifier) {
 
                 // Zona pulsanti di controllo
                 ActionButtons(
-                    onDelete = {
-                        txt = ""
-                        Log.d(tag, "BTN 'Delete' clicked")
-                    },
-                    onEnd = { Log.d(tag, "BTN 'End Game' clicked") }
+                    onDelete = onDeleteClick,
+                    onEnd = onEndClick
                 )
             }
         }
@@ -242,5 +275,5 @@ fun ActionButtons(onDelete: () -> Unit, onEnd: () -> Unit) {
 @Preview(showBackground = true)
 @Composable
 fun MainScreenPreview() {
-    MainScreen()
+    MainScreen(onEndGameClick = {})
 }
