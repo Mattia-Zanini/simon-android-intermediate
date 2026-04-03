@@ -119,9 +119,9 @@ fun MainScreen(modifier: Modifier = Modifier) {
             ActionButtons(
                 onDelete = {
                     txt = ""
-                    Log.d(tag, "Delete")
+                    Log.d(tag, "BTN 'Delete' clicked")
                 },
-                onEnd = { Log.d(tag, "End") }
+                onEnd = { Log.d(tag, "BTN 'End Game' clicked") }
             )
         }
     } else {
@@ -156,9 +156,9 @@ fun MainScreen(modifier: Modifier = Modifier) {
                 ActionButtons(
                     onDelete = {
                         txt = ""
-                        Log.d(tag, "Delete")
+                        Log.d(tag, "BTN 'Delete' clicked")
                     },
-                    onEnd = { Log.d(tag, "End") }
+                    onEnd = { Log.d(tag, "BTN 'End Game' clicked") }
                 )
             }
         }
