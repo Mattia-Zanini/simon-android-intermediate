@@ -12,14 +12,17 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -50,6 +53,8 @@ class GamesHistory : ComponentActivity() {
                             .padding(innerPadding),
                         historyList = historyData, // Qui passo historyData al composable della Schermata 2
                         buttonAction = {
+                            Log.d(tagHistoryD, "Back (from Screen 2) clicked")
+
                             this.finish() // Fa il popBack dello stack per tornare all'activity precedente
                         }
                     )
@@ -62,51 +67,75 @@ class GamesHistory : ComponentActivity() {
 @Composable
 // Dichiaro historyList come una List<String> in quanto deve SOLO leggere l'ArrayList<String> e NON modificarla
 fun ScreenTwo(modifier: Modifier = Modifier, historyList: List<String>, buttonAction: () -> Unit) {
+    val scrollState = rememberScrollState()
+
     Column(
         modifier = modifier
             .fillMaxSize()
-            .padding(16.dp) // Margine esterno
+            .padding(16.dp)
     ) {
         // Titolo della schermata
-        Row(
-            modifier = modifier
+        Text(
+            text = stringResource(R.string.history_title_text),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 24.dp),
+            textAlign = TextAlign.Center
+        )
+
+        // Uso una Column dedicata per contenere tutte le card e poterle scrollare
+        Column(
+            modifier = Modifier
                 .fillMaxWidth()
                 .weight(1f)
-                .padding(bottom = 16.dp)
+                .verticalScroll(scrollState)
         ) {
-            Text(
-                text = stringResource(R.string.history_title_text),
-                modifier = modifier.weight(1f),
-                textAlign = TextAlign.Center
-            )
-        }
-
-        // Lista scorrevole delle cards delle partite precedenti
-        repeat(historyList.size) { i ->
-            Row(
-                modifier = modifier
-                    .fillMaxWidth()
-                    .weight(1f)
-                    .background(Color.LightGray, RoundedCornerShape(8.dp))
-                    .padding(16.dp),
-                horizontalArrangement = Arrangement.Start
-            ) {
-                // Conteggio dei pulsanti cliccati
-                Text(
-                    text = historyList[i].split(", ").count().toString()
-                )
-
-                Text(
-                    text = historyList[i],
-                    maxLines = 1, // Forza il testo su una sola riga
-                    overflow = TextOverflow.Ellipsis, // Aggiunge i "..." se il testo non ci sta
-                )
+            // Lista scorrevole delle cards delle partite precedenti
+            repeat(historyList.size) { i ->
+                GameCard(historyList[i])
             }
         }
 
-        Spacer(modifier = Modifier.weight(1f))
+        Spacer(modifier = Modifier.height(16.dp))
 
         Button(onClick = buttonAction) { Text(stringResource(R.string.back_btn)) }
+    }
+}
+
+// Card della partita
+@Composable
+fun GameCard(gameString: String) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp)
+            .background(MaterialTheme.colorScheme.secondaryContainer, RoundedCornerShape(8.dp))
+            .padding(16.dp)
+            .height(25.dp),
+        horizontalArrangement = Arrangement.Start
+    ) {
+        val colorsSequence = gameString.split(", ")
+        var numSequence = colorsSequence.count()
+
+        // Controllo che la stringa sia vuota e correggo il valore di numSequence
+        if (numSequence == 1 && colorsSequence[0].isEmpty())
+            numSequence = 0
+
+        // Conteggio dei pulsanti cliccati
+        Text(
+            text = numSequence.toString(),
+            color = MaterialTheme.colorScheme.onSecondaryContainer
+        )
+
+        Spacer(modifier = Modifier.padding(horizontal = 8.dp))
+
+        Text(
+            modifier = Modifier.weight(1f),
+            text = gameString,
+            color = MaterialTheme.colorScheme.onSecondaryContainer,
+            maxLines = 1, // Forza il testo su una sola riga
+            overflow = TextOverflow.Ellipsis, // Aggiunge i "..." se il testo non ci sta
+        )
     }
 }
 
@@ -115,7 +144,7 @@ fun ScreenTwo(modifier: Modifier = Modifier, historyList: List<String>, buttonAc
 fun ScreenTwoPreview() {
     SimonIntermediateTheme {
         ScreenTwo(
-            historyList = arrayListOf<String>(),
+            historyList = arrayListOf(),
             buttonAction = {})
     }
 }

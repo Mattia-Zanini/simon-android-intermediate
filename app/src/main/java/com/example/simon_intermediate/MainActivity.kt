@@ -22,6 +22,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -128,9 +129,10 @@ fun MainScreen(modifier: Modifier = Modifier, onEndGameClick: (List<String>) -> 
     val onEndClick: () -> Unit = {
         Log.d(tagMainD, "BTN 'End Game' clicked")
 
-        if (!txt.isEmpty())
-            history += txt // aggiungo la sequenza allo storico
-        txt = "" // ripulisco la text
+        // NON controllo che txt != empty perchè c'è scritto nella consegna del progetto
+        // che bisogna salvare anche le partite con 0 pulsanti cliccati
+        history += txt // aggiungo la sequenza allo storico
+        txt = ""
 
         onEndGameClick(history)
     }
@@ -185,7 +187,7 @@ fun MainScreen(modifier: Modifier = Modifier, onEndGameClick: (List<String>) -> 
                     txt
                 )
 
-                // Questo Spacer "mangia" tutto lo spazio che avanza tra la TextBox e l'ActionButtons
+                // Lo Spacer "mangia" tutto lo spazio che avanza tra la TextBox e l'ActionButtons
                 Spacer(modifier = Modifier.weight(1f))
 
                 // Zona pulsanti di controllo
@@ -198,6 +200,7 @@ fun MainScreen(modifier: Modifier = Modifier, onEndGameClick: (List<String>) -> 
     }
 }
 
+// Matrice dei pulsanti colorati
 @Composable
 fun ColorGrid(
     modifier: Modifier = Modifier,
@@ -240,18 +243,23 @@ fun ColorGrid(
     }
 }
 
-
+// TextBox per contenere la sequenza dei pulsanti cliccati
 @Composable
 fun TextBox(modifier: Modifier = Modifier, txt: String) {
     // Reference: https://developer.android.com/reference/kotlin/androidx/compose/foundation/rememberScrollState.composable
     // Crea e "ricorda" un oggetto che mantiene traccia della posizione attuale dello scorrimento.
     val scrollState = rememberScrollState()
 
+    // Reference: https://developer.android.com/develop/ui/compose/designsystems/material3
+    // Reference: https://m3.material.io/styles/color/roles
+    // Utilizzo il colorScheme di Material Design perchè cambia il colore
+    // del testo e dello sfondo a seconda del tema del telefono automaticamente
     Text(
         text = txt,
+        color = MaterialTheme.colorScheme.onSecondaryContainer,
         modifier = modifier
-            // Sfondo grigio con angoli arrotondati
-            .background(Color.LightGray, RoundedCornerShape(8.dp))
+            .background(MaterialTheme.colorScheme.secondaryContainer, RoundedCornerShape(8.dp))
+
             // Padding interno al testo (è interno perchè applico il padding DOPO il background)
             .padding(16.dp)
             // Abilito lo scorrimento verticale se il testo eccede lo spazio
@@ -259,10 +267,12 @@ fun TextBox(modifier: Modifier = Modifier, txt: String) {
     )
 }
 
+// Zona dei pulsanti che gestiscono la pulizia della sequenza o il salvataggio della partita corrente allo storico
 @Composable
 fun ActionButtons(onDelete: () -> Unit, onEnd: () -> Unit) {
     Row(
         modifier = Modifier.fillMaxWidth(),
+
         // Allineo i pulsanti ai lati opposti della riga lasciando, per l'appunto, uno spazio in mezzo tra di loro
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
