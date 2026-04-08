@@ -14,9 +14,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -51,12 +50,7 @@ class GamesHistory : ComponentActivity() {
                         modifier = Modifier
                             .fillMaxSize()
                             .padding(innerPadding),
-                        historyList = historyData, // Qui passo historyData al composable della Schermata 2
-                        buttonAction = {
-                            Log.d(tagHistoryD, "Back (from Screen 2) clicked")
-
-                            this.finish() // Fa il popBack dello stack per tornare all'activity precedente
-                        }
+                        historyList = historyData // Qui passo historyData al composable della Schermata 2
                     )
                 }
             }
@@ -66,9 +60,7 @@ class GamesHistory : ComponentActivity() {
 
 @Composable
 // Dichiaro historyList come una List<String> in quanto deve SOLO leggere l'ArrayList<String> e NON modificarla
-fun ScreenTwo(modifier: Modifier = Modifier, historyList: List<String>, buttonAction: () -> Unit) {
-    val scrollState = rememberScrollState()
-
+fun ScreenTwo(modifier: Modifier = Modifier, historyList: List<String>) {
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -83,22 +75,16 @@ fun ScreenTwo(modifier: Modifier = Modifier, historyList: List<String>, buttonAc
             textAlign = TextAlign.Center
         )
 
-        // Uso una Column dedicata per contenere tutte le card e poterle scrollare
-        Column(
+        // LazyColumn dedicata per contenere tutte le cards delle partite precedenti e poterle scrollare
+        LazyColumn(
             modifier = Modifier
                 .fillMaxWidth()
                 .weight(1f)
-                .verticalScroll(scrollState)
         ) {
-            // Lista scorrevole delle cards delle partite precedenti
-            repeat(historyList.size) { i ->
+            items(historyList.size) { i ->
                 GameCard(historyList[i])
             }
         }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Button(onClick = buttonAction) { Text(stringResource(R.string.back_btn)) }
     }
 }
 
@@ -143,8 +129,6 @@ fun GameCard(gameString: String) {
 @Composable
 fun ScreenTwoPreview() {
     SimonIntermediateTheme {
-        ScreenTwo(
-            historyList = arrayListOf(),
-            buttonAction = {})
+        ScreenTwo(historyList = arrayListOf())
     }
 }

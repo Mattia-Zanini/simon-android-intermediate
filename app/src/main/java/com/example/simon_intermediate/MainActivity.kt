@@ -66,7 +66,7 @@ class MainActivity : ComponentActivity() {
                         modifier = Modifier
                             .fillMaxSize()
                             .padding(innerPadding),
-                        onEndGameClick = { updatedHistory -> // <-- Ricevo lo storico dal composable
+                        goToScreen2 = { updatedHistory -> // <-- Ricevo lo storico dal composable
 
                             val myIntent = Intent(this, GamesHistory::class.java)
 
@@ -92,7 +92,7 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun MainScreen(modifier: Modifier = Modifier, onEndGameClick: (List<String>) -> Unit) {
+fun MainScreen(modifier: Modifier = Modifier, goToScreen2: (List<String>) -> Unit) {
     // Recupero l'orientamento attuale del dispositivo
     val orientation = LocalConfiguration.current.orientation
     val isPortrait: Boolean = orientation == Configuration.ORIENTATION_PORTRAIT
@@ -134,7 +134,7 @@ fun MainScreen(modifier: Modifier = Modifier, onEndGameClick: (List<String>) -> 
         history += txt // aggiungo la sequenza allo storico
         txt = ""
 
-        onEndGameClick(history)
+        goToScreen2(history)
     }
 
     if (isPortrait) {
@@ -285,5 +285,5 @@ fun ActionButtons(onDelete: () -> Unit, onEnd: () -> Unit) {
 @Preview(showBackground = true)
 @Composable
 fun MainScreenPreview() {
-    MainScreen(onEndGameClick = {})
+    MainScreen(goToScreen2 = {})
 }
