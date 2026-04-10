@@ -16,7 +16,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -50,7 +49,7 @@ class GamesHistory : ComponentActivity() {
                         modifier = Modifier
                             .fillMaxSize()
                             .padding(innerPadding),
-                        historyList = historyData // Qui passo historyData al composable della Schermata 2
+                        historyList = historyData // Qui passo lo storico delle partite al composable della Schermata 2
                     )
                 }
             }
@@ -75,7 +74,7 @@ fun ScreenTwo(modifier: Modifier = Modifier, historyList: List<String>) {
             textAlign = TextAlign.Center
         )
 
-        // LazyColumn dedicata per contenere tutte le cards delle partite precedenti e poterle scrollare
+        // LazyColumn dedicata per contenere tutte le cards delle partite fatte e poterle scrollare
         LazyColumn(
             modifier = Modifier
                 .fillMaxWidth()
@@ -88,7 +87,7 @@ fun ScreenTwo(modifier: Modifier = Modifier, historyList: List<String>) {
     }
 }
 
-// Card della partita
+// Card della singola partita
 @Composable
 fun GameCard(gameString: String) {
     Row(
@@ -115,6 +114,7 @@ fun GameCard(gameString: String) {
 
         Spacer(modifier = Modifier.padding(horizontal = 8.dp))
 
+        // Sequenza dei pulsanti cliccati
         Text(
             modifier = Modifier.weight(1f),
             text = gameString,

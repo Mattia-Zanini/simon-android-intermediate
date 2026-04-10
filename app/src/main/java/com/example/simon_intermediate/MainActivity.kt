@@ -43,21 +43,16 @@ const val tagMainD = "MainActivity"
 
 class MainActivity : ComponentActivity() {
 
-    // Viene chiamato quando l'activity viene creata per la prima volta
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         Log.d(tagMainD, "onCreate Activity 1")
 
-        // Abilita la visualizzazione "edge-to-edge" (a tutto schermo) per le versioni API < 35
         enableEdgeToEdge()
 
-        // Imposta e visualizza il contenuto dell'interfaccia utente (UI)
         setContent {
             SimonIntermediateTheme {
 
-                // Reference: https://developer.android.com/develop/ui/compose/components/scaffold
-                // Lo scaffold riempie l'intera area del display
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
 
                     // MainScreen utilizza gli "insets" (presenti in 'innerPadding') per mantenere
@@ -129,8 +124,7 @@ fun MainScreen(modifier: Modifier = Modifier, goToScreen2: (List<String>) -> Uni
     val onEndClick: () -> Unit = {
         Log.d(tagMainD, "BTN 'End Game' clicked")
 
-        // NON controllo che txt != empty perchè c'è scritto nella consegna del progetto
-        // che bisogna salvare anche le partite con 0 pulsanti cliccati
+        // NON controllo che txt != empty perchè salvo anche le partite con 0 pulsanti cliccati
         history += txt // aggiungo la sequenza allo storico
         txt = ""
 
@@ -179,7 +173,6 @@ fun MainScreen(modifier: Modifier = Modifier, goToScreen2: (List<String>) -> Uni
                     .weight(0.45f)
                     .fillMaxHeight()
             ) {
-                // Text per contenere la sequenza
                 TextBox(
                     Modifier
                         .fillMaxWidth()
@@ -190,7 +183,6 @@ fun MainScreen(modifier: Modifier = Modifier, goToScreen2: (List<String>) -> Uni
                 // Lo Spacer "mangia" tutto lo spazio che avanza tra la TextBox e l'ActionButtons
                 Spacer(modifier = Modifier.weight(1f))
 
-                // Zona pulsanti di controllo
                 ActionButtons(
                     onDelete = onDeleteClick,
                     onEnd = onEndClick
@@ -216,8 +208,7 @@ fun ColorGrid(
         repeat(cols) {
             Row(
                 modifier = Modifier
-                    // Distribuisco equamente lo spazio verticale tra le righe
-                    .weight(1f)
+                    .weight(1f) // Distribuisco equamente lo spazio verticale tra le righe
                     .fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(8.dp) // Spazio tra colonne
             ) {
@@ -226,8 +217,7 @@ fun ColorGrid(
 
                     Button(
                         modifier = Modifier
-                            // Distribuisco equamente lo spazio orizzontale tra i pulsanti
-                            .weight(1f)
+                            .weight(1f) // Distribuisco equamente lo spazio orizzontale tra i pulsanti
                             .fillMaxHeight()
                             .padding(vertical = 4.dp), // Spazio tra le righe
                         shape = RoundedCornerShape(6.dp),
@@ -262,6 +252,7 @@ fun TextBox(modifier: Modifier = Modifier, txt: String) {
 
             // Padding interno al testo (è interno perchè applico il padding DOPO il background)
             .padding(16.dp)
+
             // Abilito lo scorrimento verticale se il testo eccede lo spazio
             .verticalScroll(scrollState)
     )
@@ -273,7 +264,7 @@ fun ActionButtons(onDelete: () -> Unit, onEnd: () -> Unit) {
     Row(
         modifier = Modifier.fillMaxWidth(),
 
-        // Allineo i pulsanti ai lati opposti della riga lasciando, per l'appunto, uno spazio in mezzo tra di loro
+        // Allineo i pulsanti ai lati opposti della riga lasciando, quindi rimane uno spazio in mezzo tra di loro
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Button(onClick = onDelete) { Text(stringResource(R.string.delete_btn)) }
@@ -281,7 +272,6 @@ fun ActionButtons(onDelete: () -> Unit, onEnd: () -> Unit) {
     }
 }
 
-// Reference: https://developer.android.com/develop/ui/compose/tooling/previews
 @Preview(showBackground = true)
 @Composable
 fun MainScreenPreview() {
